@@ -1,0 +1,7 @@
+things that you can do with the Panda:
+
+print_robot_state -> gives you the robot's current state information.
+go_JointPosition -> tell the robot to go to any joint position that you choose.
+go_CartesianPosition -> tell the robot to go to any x-y-z position that you choose.
+hold_object -> indefinitely pinch an object with a given width and force.
+drop_object -> let go of the object.

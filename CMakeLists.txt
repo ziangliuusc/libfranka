@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 project(libfranka
-  VERSION 0.8.0
+  VERSION 0.6.0
   LANGUAGES CXX
 )
 
@@ -50,7 +50,6 @@ add_subdirectory(common)
 ## Library
 add_library(franka SHARED
   src/control_loop.cpp
-  src/control_tools.cpp
   src/control_types.cpp
   src/duration.cpp
   src/errors.cpp
@@ -62,7 +61,6 @@ add_library(franka SHARED
   src/load_calculations.cpp
   src/log.cpp
   src/logger.cpp
-  src/lowpass_filter.cpp
   src/model.cpp
   src/model_library.cpp
   src/network.cpp
@@ -70,8 +68,6 @@ add_library(franka SHARED
   src/robot.cpp
   src/robot_impl.cpp
   src/robot_state.cpp
-  src/vacuum_gripper.cpp
-  src/vacuum_gripper_state.cpp
 )
 add_library(Franka::Franka ALIAS franka)
 
@@ -80,15 +76,6 @@ set_target_properties(franka PROPERTIES
   VERSION ${libfranka_VERSION}
   SOVERSION ${libfranka_VERSION_MAJOR}.${libfranka_VERSION_MINOR} # Use minor version while we're at 0.x
   EXPORT_NAME Franka
-)
-target_compile_features(franka INTERFACE
-  cxx_attribute_deprecated
-  cxx_constexpr
-  cxx_defaulted_functions
-  cxx_deleted_functions
-  cxx_generalized_initializers
-  cxx_noexcept
-  cxx_uniform_initialization
 )
 if(MSVC)
   target_compile_definitions(franka PUBLIC
@@ -154,7 +141,7 @@ macro(find_package)
   endif()
 endmacro()
 
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
@@ -190,7 +177,7 @@ endif()
 set(CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}-1)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Franka Emika GmbH")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libpoco-dev")
-set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka, ros-melodic-libfranka")
+set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka")
 
 include(CPack)
 

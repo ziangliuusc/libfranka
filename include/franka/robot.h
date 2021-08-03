@@ -29,13 +29,9 @@ class Model;
  * @note
  * The members of this class are threadsafe.
  *
- * @par Nominal end effector frame NE
- * The nominal end effector frame is configured outside of libfranka and cannot be changed here.
- *
  * @par End effector frame EE
- * By default, the end effector frame EE is the same as the nominal end effector frame NE
- * (i.e. the transformation between NE and EE is the identity transformation).
- * With Robot::setEE, a custom transformation matrix can be set.
+ * While the end effector parameters are set in a configuration file, it is possible to change the
+ * end effector frame with Robot::setEE.
  *
  * @anchor k-frame
  * @par Stiffness frame K
@@ -144,7 +140,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint-level torque commands are NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -171,8 +166,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint-level torque or joint position commands are NaN or
-   * infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -201,8 +194,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint-level torque or joint velocitiy commands are NaN or
-   * infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -231,8 +222,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint-level torque or Cartesian pose command elements are NaN
-   * or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -261,8 +250,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint-level torque or Cartesian velocity command elements are
-   * NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -290,7 +277,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint position commands are NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -318,7 +304,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if joint velocity commands are NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -346,7 +331,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if Cartesian pose command elements are NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -374,7 +358,6 @@ class Robot {
    * @throw InvalidOperationException if a conflicting operation is already running.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    * @throw RealtimeException if realtime priority cannot be set for the current thread.
-   * @throw std::invalid_argument if Cartesian velocity command elements are NaN or infinity.
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
@@ -538,9 +521,8 @@ class Robot {
    *
    * User-provided torques are not affected by this setting.
    *
-   * @param[in] K_x Cartesian impedance values \f$K_x=(x \in [10,3000] \frac{N}{m}, y \in [10,3000]
-   * \frac{N}{m}, z \in [10,3000] \frac{N}{m}, R \in [1,300] \frac{Nm}{rad}, P \in [1,300]
-   * \frac{Nm}{rad}, Y \in [1,300]  \frac{Nm}{rad})\f$
+   * @param[in] K_x Cartesian impedance values \f$K_x=(x, y, z, R, P, Y)\f$.
+   *
    * @throw CommandException if the Control reports an error.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    */
@@ -578,21 +560,19 @@ class Robot {
   void setK(const std::array<double, 16>& EE_T_K);  // NOLINT(readability-identifier-naming)
 
   /**
-   * Sets the transformation \f$^{NE}T_{EE}\f$ from nominal end effector to end effector frame.
+   * Sets the transformation \f$^FT_{EE}\f$ from flange to end effector frame.
    *
    * The transformation matrix is represented as a vectorized 4x4 matrix in column-major format.
    *
-   * @param[in] NE_T_EE Vectorized NE-to-EE transformation matrix \f$^{NE}T_{EE}\f$, column-major.
+   * @param[in] F_T_EE Vectorized flange-to-EE transformation matrix \f$^FT_{EE}\f$, column-major.
    *
    * @throw CommandException if the Control reports an error.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    *
-   * @see RobotState::NE_T_EE for end effector pose in nominal end effector frame.
    * @see RobotState::O_T_EE for end effector pose in world base frame.
-   * @see RobotState::F_T_EE for end effector pose in flange frame.
-   * @see Robot for an explanation of the NE and EE frames.
+   * @see Robot for an explanation of the EE frame.
    */
-  void setEE(const std::array<double, 16>& NE_T_EE);  // NOLINT(readability-identifier-naming)
+  void setEE(const std::array<double, 16>& F_T_EE);  // NOLINT(readability-identifier-naming)
 
   /**
    * Sets dynamic parameters of a payload.

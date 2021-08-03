@@ -14,6 +14,9 @@
 
 namespace franka {
 
+void setCurrentThreadToRealtime(bool throw_on_error);
+bool hasRealtimeKernel();
+
 template <typename T>
 class ControlLoop {
  public:
