@@ -57,6 +57,7 @@ set(EXAMPLES
   go_Home
   vla_Velocity
   vla_Velocity_compliant
+  realtime_joint_position
 )
 
 foreach(example ${EXAMPLES})

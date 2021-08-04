@@ -45,6 +45,7 @@ JointPositionController::JointPositionController(const std::array<double, 7> q, 
 franka::JointPositions JointPositionController::operator()(const franka::RobotState& robot_state,
                                                    franka::Duration period) {
   time += period.toSec();
+  std::cout << time << std::endl;
 
   if (time == 0.0) {
     q_start = robot_state.q_d;
